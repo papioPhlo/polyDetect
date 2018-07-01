@@ -27,7 +27,7 @@ python polydetect.py <alu> <ref> <pe.fq> <se.fq> <out> <id> chrom> <polyA>
 
 Running dataEval.py ===================
 Make sure that for each sample, a directory exists containing only the files generated using polyDetect for that sample. The name of each directory should be the appropriate sample id <id>. Much match the prefix of the files contained within. Now place all of these directories in one master directory.
-In this master directory, create a file containing a list of all of the sample IDs (See sample orgID list on github: sample.orgID)
+In this master directory, create a file containing a list of all of the sample IDs (See sample orgID list in this repository: sample.orgID)
 From the master directory, run dataEval.py
 dataEval.py <master> <idlist> <predict> <chrom> > <output>
 <master> - path to master directory
