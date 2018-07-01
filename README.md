@@ -6,12 +6,12 @@ Pre-requisites ============== polyDetect is a python script and requires Python 
 If you wish to create your fastq file using fastQgenie (recommended) you will need:
 sratoolkit.2.6.2 or higher (make sure to add to your path) 
 nesoni (make sure to add to your path)
-If you wish to run polyDetect with a pre-existing fastq file, you will need to check the fastq instructional file to make sure your fastq is formatted properly.
+If you wish to run polyDetect with a pre-existing fastq file, you will need to check the fastq sample.fq file located in this repository to make sure your fastq is formatted properly.
 To run polyDetect, you will need the following tools:
 bwa (make sure to add to your path)
 bowTie2 (make sure to add to your path)
 Running fastQgenie ===================
-You must first construct a text file containing a list of SRA Run accessions (SRRs). A sample SRR file is provided on GitHub (SRR.sample). From the same directory containing your custom SRR file, execute the fastQgenie script.
+You must first construct a text file containing a list of SRA Run accessions. A sample SRR file is provided in this repository (sample.srr). From the same directory containing your custom SRR file, execute the fastQgenie script.
 
 Running polyDetect =================== 
 The polyDetect.py script should be executed from an empty directory followed by 8 mandatory commands:
@@ -23,7 +23,7 @@ python polydetect.py <alu> <ref> <pe.fq> <se.fq> <out> <id> chrom> <polyA>
 <out> - path to output directory
 <id> - Sample ID: custom string used to identify this sample. Must consist of letters and/or numbers (no spaces or special characters). This string will be the prefix for your output files.
 <chrom> - total number of chromosomes in your reference genome
-<polyA> - polyA consensus sequence. The standard Alu polyA consensus sequence recommended for this program can be downloaded from github
+<polyA> - polyA consensus sequence. The standard Alu polyA consensus sequence recommended for this program can be found in this repository.
 
 Running dataEval.py ===================
 Make sure that for each sample, a directory exists containing only the files generated using polyDetect for that sample. The name of each directory should be the appropriate sample id <id>. Much match the prefix of the files contained within. Now place all of these directories in one master directory.
