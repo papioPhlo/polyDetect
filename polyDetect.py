@@ -1,23 +1,12 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-Spyder Editor
-
-This is a temporary script file.
-"""
-
 import sys
 import re
 from sam import *
 from essentials import *
-from meiDetect import *
 from sra import *
 import linecache
-#import numpy as np
 import os
 from subprocess import Popen, PIPE
 from timeit import default_timer as timer
-from polyAnna import *
 
 path2aluConsensus,path2referenceGenome,path2_PE_fq,path2_SE_fq,path2outdir,orgID,path2polyA=sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6],sys.argv[7]
 
