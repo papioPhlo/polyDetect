@@ -10,6 +10,9 @@ If you wish to run polyDetect with a pre-existing fastq file, you will need to c
 To run polyDetect, you will need the following tools:
 bwa (make sure to add to your path)
 bowTie2 (make sure to add to your path)
+sam.py (in this repository)
+sra.py (in this repository)
+essentials.py (in this repository)
 Running fastQgenie ===================
 You must first construct a text file containing a list of SRA Run accessions. A sample SRR file is provided in this repository (sample.srr). From the same directory containing your custom SRR file, execute the fastQgenie script.
 
