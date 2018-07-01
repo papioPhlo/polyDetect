@@ -8,7 +8,7 @@ import os
 from subprocess import Popen, PIPE
 from timeit import default_timer as timer
 
-path2aluConsensus,path2referenceGenome,path2_PE_fq,path2_SE_fq,path2outdir,orgID,path2polyA=sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6],sys.argv[7]
+path2aluConsensus,path2referenceGenome,path2_PE_fq,path2_SE_fq,path2outdir,orgID,chromLen,path2polyA=sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6],sys.argv[7],sys.argv[8]
 
 def editFQ_title(inpath,outpath):
     with open(inpath,'r') as infastq:
@@ -678,10 +678,10 @@ def parseSplitFQ(path2fq,rnSet,path2outFQ):
                         head=True
                         outFq.write(line)
                         
-def sortPredict(path2predict,outfile):
+def sortPredict(path2predict,outfile,chromLen):
     with open(outfile,'w') as out:
         sorting_piles,chrom_list=[],[]
-        for i in range(1,21):
+        for i in range(1,(int(chromLen)+1):
             sorting_piles.append([])
             chrom_list.append(str(i))
         for p in lister(path2predict):
@@ -734,7 +734,7 @@ bowtie2(path2referenceGenome,(orgID+'.S.PE.fq'),'P',(orgID+'.S.PE.sam'))
 bowtie2(path2referenceGenome,(orgID+'.S.DS.fq'),'S',(orgID+'.S.DS.sam'))
 bowtie2(path2referenceGenome,(orgID+'.S.SP.fq'),'S',(orgID+'.S.SP.sam'))
 predictInsertionOG(orgID+'.S',orgID+'.S.predict')
-sortPredict(orgID+'.S.predict',orgID+'.S.predict.sort')
+sortPredict(orgID+'.S.predict',orgID+'.S.predict.sort',chromLen)
 cleanup('S',orgID)
 
 bwaMeM(path2aluConsensus,path2outdir+orgID+'.PE.fq','P','L',path2outdir+orgID+'alu.P.L.sam')
@@ -747,7 +747,7 @@ bowtie2(path2referenceGenome,(orgID+'.L.PE.fq'),'P',(orgID+'.L.PE.sam'))
 bowtie2(path2referenceGenome,(orgID+'.L.DS.fq'),'S',(orgID+'.L.DS.sam'))
 bowtie2(path2referenceGenome,(orgID+'.L.SP.fq'),'S',(orgID+'.L.SP.sam'))
 predictInsertionOG(orgID+'.L',orgID+'.L.predict')
-sortPredict(orgID+'.L.predict',orgID+'.L.predict.sort')
+sortPredict(orgID+'.L.predict',orgID+'.L.predict.sort',chromLen)
 cleanup('L',orgID)
 
 bwaMeM(path2polyA,path2outdir+orgID+'.PE.fq','P','L',(orgID+'.P.polyA.sam'))
