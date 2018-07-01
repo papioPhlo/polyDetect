@@ -6,7 +6,7 @@ Pre-requisites ============== polyDetect is a python script and requires Python 
 If you wish to create your fastq file using fastQgenie (recommended) you will need:
 sratoolkit.2.6.2 or higher (make sure to add to your path) 
 nesoni (make sure to add to your path)
-If you wish to run polyDetect with a pre-existing fastq file, you will need to check the fastq sample.fq file located in this repository to make sure your fastq is formatted properly.
+If you wish to run polyDetect with a pre-existing fastq file, you will need to check the two sample fastq files located in this repository to make sure your fastq is formatted properly. You're files match the format of these sample files identically, including the OP:i:N tag and the name of each sequence must be a number with 12 digits (first sequence should be named 000000000001).
 To run polyDetect, you will need the following tools:
 bwa (make sure to add to your path)
 bowTie2 (make sure to add to your path)
