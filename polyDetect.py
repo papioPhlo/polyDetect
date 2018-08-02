@@ -1,8 +1,17 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Aug  2 15:26:43 2018
+
+@author: vallmer
+"""
+
 import sys
 import re
 from sam import *
 from essentials import *
 from sra import *
+from polyAnna import *
 import linecache
 import os
 from subprocess import Popen, PIPE
@@ -184,13 +193,13 @@ def clipOutAluPFU(cigar,pos,seq,qual):
         if part==False:
             return('','','fully_clipped',position)
 
-def processSamA(path2Psam,path2Ssam,reference):
-    with open(reference+'.DS.info','w') as DS_info:
-        with open(reference+'.SP.info','w') as SP_info:
-            with open(reference+'.DS.fq','w') as fastqDS:
-                with open(reference+'.SP.fq','w') as fastqSP:
-                    with open(path2Psam,'r') as samfileP:
-                        with open(path2Ssam,'r') as samfileS:
+def processSamA(path2out,path2Psam,path2Ssam,reference):
+    with open(path2out+reference+'.DS.info','w') as DS_info:
+        with open(path2out+reference+'.SP.info','w') as SP_info:
+            with open(path2out+reference+'.DS.fq','w') as fastqDS:
+                with open(path2out+reference+'.SP.fq','w') as fastqSP:
+                    with open(path2out+path2Psam,'r') as samfileP:
+                        with open(path2out+path2Ssam,'r') as samfileS:
                             pe,ds,sp=1,1,1
                             temp,n=[],0
                             for line in samfileP:
@@ -250,14 +259,14 @@ def processSamA(path2Psam,path2Ssam,reference):
 
     
 
-def processSam1(path2Psam,path2Ssam,reference):
+def processSam1(path2out,path2Psam,path2Ssam,reference):
     """The Purpose is to: 1.) Condense Each Line by Removing the SEQ and QUAL 2.) Separate the Forward and Reverse 3.) Parse out only the mapped reads""" 
-    with open(reference+'.PE.fq','w') as fastqPE:
-        with open(reference+'.PE.info','w') as PE_info:
-            with open(path2Psam,'r') as samfileP:
-                with open(path2Ssam,'r') as samfileS:
-                    with open(reference+'_fwd.dup.sam','w') as fwd_dup:
-                        with open(reference+'_rvs.dup.sam','w') as rvs_dup:
+    with open(path2out+reference+'.PE.fq','w') as fastqPE:
+        with open(path2out+reference+'.PE.info','w') as PE_info:
+            with open(path2out+path2Psam,'r') as samfileP:
+                with open(path2out+path2Ssam,'r') as samfileS:
+                    with open(path2out+reference+'_fwd.dup.sam','w') as fwd_dup:
+                        with open(path2out+reference+'_rvs.dup.sam','w') as rvs_dup:
                             tempF,tempR,n,mapped,f,r=[],[],1,False,0,0
                             pe,ds,sp=1,1,1
                             for line in samfileP:
@@ -405,12 +414,12 @@ def pairedEndPredict(read1,read2,info1,info2):
     else:
         return(['Null'])
 
-def predictInsertionOG(head_tag,outfile):
-    with open(head_tag+'.PE.sam','r') as pairedEnd:
-        with open(head_tag+'.SP.sam','r') as splitRead:
-            with open(head_tag+'.DS.sam','r') as discordant:
+def predictInsertionOG(path2out,head_tag,outfile):
+    with open(path2out+head_tag+'.PE.sam','r') as pairedEnd:
+        with open(path2out+head_tag+'.SP.sam','r') as splitRead:
+            with open(path2out+head_tag+'.DS.sam','r') as discordant:
                 with open(outfile,'w') as final:
-                    temp,finaList,ds_info,sp_info,pe_info=[],[],lister(head_tag+'.DS.info'),lister(head_tag+'.SP.info'),lister(head_tag+'.PE.info')
+                    temp,finaList,ds_info,sp_info,pe_info=[],[],lister(path2out+head_tag+'.DS.info'),lister(path2out+head_tag+'.SP.info'),lister(path2out+head_tag+'.PE.info')
                     for line in pairedEnd:
                         if line[0]!='@':
                             if temp==[]:
@@ -694,65 +703,60 @@ def sortPredict(path2predict,outfile,chromLen):
             for item in s_sort:
                 out.write(item+'\n')
 
-def cleanup(label,orgID):
+def cleanup(label,orgID,path2out):
     if label!='A':
-        subprocess.call(['rm -f '+orgID+'.'+label+'.DS.fq'], shell=True)
-        subprocess.call(['rm -f '+orgID+'.'+label+'.DS.info'], shell=True)
-        subprocess.call(['rm -f '+orgID+'.'+label+'.DS.sam'], shell=True)
-        subprocess.call(['rm -f '+orgID+'.'+label+'.PE.sam'], shell=True)
-        subprocess.call(['rm -f '+orgID+'.'+label+'.PE.fq'], shell=True)
-        subprocess.call(['rm -f '+orgID+'.'+label+'.PE.info'], shell=True)
-        subprocess.call(['rm -f '+orgID+'.'+label+'.SP.sam'], shell=True)
-        subprocess.call(['rm -f '+orgID+'.'+label+'.SP.fq'], shell=True)
-        subprocess.call(['rm -f '+orgID+'.'+label+'.SP.info'], shell=True)
-        subprocess.call(['rm -f '+orgID+'.'+label+'_fwd.dup.sam'], shell=True)
-        subprocess.call(['rm -f '+orgID+'.'+label+'_rvs.dup.sam'], shell=True)
-        subprocess.call(['rm -f '+orgID+'alu.P.'+label+'.mapped.sam'], shell=True)        
-        subprocess.call(['rm -f '+orgID+'alu.P.'+label+'.sam'], shell=True)
-        subprocess.call(['rm -f '+orgID+'alu.S.'+label+'.mapped.sam'], shell=True)        
-        subprocess.call(['rm -f '+orgID+'alu.S.'+label+'.sam'], shell=True)
-        subprocess.call(['rm -f '+orgID+'.'+label+'.predict'], shell=True)
+        subprocess.call(['rm -f '+path2out+orgID+'.'+label+'.DS.fq'], shell=True)
+        subprocess.call(['rm -f '+path2out+orgID+'.'+label+'.DS.info'], shell=True)
+        subprocess.call(['rm -f '+path2out+orgID+'.'+label+'.DS.sam'], shell=True)
+        subprocess.call(['rm -f '+path2out+orgID+'.'+label+'.PE.sam'], shell=True)
+        subprocess.call(['rm -f '+path2out+orgID+'.'+label+'.PE.fq'], shell=True)
+        subprocess.call(['rm -f '+path2out+orgID+'.'+label+'.PE.info'], shell=True)
+        subprocess.call(['rm -f '+path2out+orgID+'.'+label+'.SP.sam'], shell=True)
+        subprocess.call(['rm -f '+path2out+orgID+'.'+label+'.SP.fq'], shell=True)
+        subprocess.call(['rm -f '+path2out+orgID+'.'+label+'.SP.info'], shell=True)
+        subprocess.call(['rm -f '+path2out+orgID+'.'+label+'_fwd.dup.sam'], shell=True)
+        subprocess.call(['rm -f '+path2out+orgID+'.'+label+'_rvs.dup.sam'], shell=True)
+        subprocess.call(['rm -f '+path2out+orgID+'alu.P.'+label+'.mapped.sam'], shell=True)        
+        subprocess.call(['rm -f '+path2out+orgID+'alu.P.'+label+'.sam'], shell=True)
+        subprocess.call(['rm -f '+path2out+orgID+'alu.S.'+label+'.mapped.sam'], shell=True)        
+        subprocess.call(['rm -f '+path2out+orgID+'alu.S.'+label+'.sam'], shell=True)
+        subprocess.call(['rm -f '+path2out+orgID+'.'+label+'.predict'], shell=True)
     else:
-        subprocess.call(['rm -f '+orgID+'.P.polyA.sam'], shell=True)
-        subprocess.call(['rm -f '+orgID+'.S.polyA.sam'], shell=True)
-        subprocess.call(['rm -f '+orgID+'.polyA.fq'], shell=True)
-        subprocess.call(['rm -f '+orgID+'.polyA.info'], shell=True)        
-        subprocess.call(['rm -f '+orgID+'.polyA.sam'], shell=True)
-
-editFQ_title(path2_PE_fq,path2outdir+orgID+'.PE.fq')  
-editFQ_title(path2_SE_fq,path2outdir+orgID+'.SE.fq')
-subprocess.call(['rm -f clipped_paired.fq'], shell=True)
-subprocess.call(['rm -f clipped_single.fq'], shell=True)
+        subprocess.call(['rm -f '+path2out+orgID+'.P.polyA.sam'], shell=True)
+        subprocess.call(['rm -f '+path2out+orgID+'.S.polyA.sam'], shell=True)
+        subprocess.call(['rm -f '+path2out+orgID+'.polyA.fq'], shell=True)
+        subprocess.call(['rm -f '+path2out+orgID+'.polyA.info'], shell=True)        
+        subprocess.call(['rm -f '+path2out+orgID+'.polyA.sam'], shell=True)
 
 bwaMeM(path2aluConsensus,path2outdir+orgID+'.PE.fq','P','S',path2outdir+orgID+'alu.P.S.sam')
 bwaMeM(path2aluConsensus,path2outdir+orgID+'.SE.fq','S','S',path2outdir+orgID+'alu.S.S.sam')
 mappOnly(path2outdir+orgID+'alu.P.S.sam',path2outdir+orgID+'alu.P.S.mapped.sam')
 mappOnly(path2outdir+orgID+'alu.S.S.sam',path2outdir+orgID+'alu.S.S.mapped.sam')
-processSam1((path2outdir+orgID+'alu.P.S.sam'),(path2outdir+orgID+'alu.S.S.sam'),(orgID+'.S'))
-processSamA((path2outdir+orgID+'alu.P.S.mapped.sam'),(path2outdir+orgID+'alu.S.S.mapped.sam'),(orgID+'.S'))
-bowtie2(path2referenceGenome,(orgID+'.S.PE.fq'),'P',(orgID+'.S.PE.sam'))
-bowtie2(path2referenceGenome,(orgID+'.S.DS.fq'),'S',(orgID+'.S.DS.sam'))
-bowtie2(path2referenceGenome,(orgID+'.S.SP.fq'),'S',(orgID+'.S.SP.sam'))
-predictInsertionOG(orgID+'.S',orgID+'.S.predict')
-sortPredict(orgID+'.S.predict',orgID+'.S.predict.sort',chromLen)
-cleanup('S',orgID)
+processSam1((path2outdir),(orgID+'alu.P.S.sam'),(orgID+'alu.S.S.sam'),(orgID+'.S'))
+processSamA((path2outdir),(orgID+'alu.P.S.mapped.sam'),(orgID+'alu.S.S.mapped.sam'),(orgID+'.S'))
+bowtie2(path2referenceGenome,(path2outdir+orgID+'.S.PE.fq'),'P',(path2outdir+orgID+'.S.PE.sam'))
+bowtie2(path2referenceGenome,(path2outdir+orgID+'.S.DS.fq'),'S',(path2outdir+orgID+'.S.DS.sam'))
+bowtie2(path2referenceGenome,(path2outdir+orgID+'.S.SP.fq'),'S',(path2outdir+orgID+'.S.SP.sam'))
+predictInsertionOG(path2outdir,(orgID+'.S'),path2outdir+orgID+'.S.predict')
+sortPredict(path2outdir+orgID+'.S.predict',path2outdir+orgID+'.S.predict.sort',chromLen)
+cleanup('S',orgID,path2outdir)
 
 bwaMeM(path2aluConsensus,path2outdir+orgID+'.PE.fq','P','L',path2outdir+orgID+'alu.P.L.sam')
 bwaMeM(path2aluConsensus,path2outdir+orgID+'.SE.fq','S','L',path2outdir+orgID+'alu.S.L.sam')
 mappOnly(path2outdir+orgID+'alu.P.L.sam',path2outdir+orgID+'alu.P.L.mapped.sam')
 mappOnly(path2outdir+orgID+'alu.S.L.sam',path2outdir+orgID+'alu.S.L.mapped.sam')
-processSam1((path2outdir+orgID+'alu.P.L.sam'),(path2outdir+orgID+'alu.S.L.sam'),(orgID+'.L'))
-processSamA((path2outdir+orgID+'alu.P.L.mapped.sam'),(path2outdir+orgID+'alu.S.L.mapped.sam'),(orgID+'.L'))
-bowtie2(path2referenceGenome,(orgID+'.L.PE.fq'),'P',(orgID+'.L.PE.sam'))
-bowtie2(path2referenceGenome,(orgID+'.L.DS.fq'),'S',(orgID+'.L.DS.sam'))
-bowtie2(path2referenceGenome,(orgID+'.L.SP.fq'),'S',(orgID+'.L.SP.sam'))
-predictInsertionOG(orgID+'.L',orgID+'.L.predict')
-sortPredict(orgID+'.L.predict',orgID+'.L.predict.sort',chromLen)
-cleanup('L',orgID)
+processSam1((path2outdir),(orgID+'alu.P.L.sam'),(orgID+'alu.S.L.sam'),(orgID+'.L'))
+processSamA((path2outdir),(orgID+'alu.P.L.mapped.sam'),(orgID+'alu.S.L.mapped.sam'),(orgID+'.L'))
+bowtie2(path2referenceGenome,(path2outdir+orgID+'.L.PE.fq'),'P',(path2outdir+orgID+'.L.PE.sam'))
+bowtie2(path2referenceGenome,(path2outdir+orgID+'.L.DS.fq'),'S',(path2outdir+orgID+'.L.DS.sam'))
+bowtie2(path2referenceGenome,(path2outdir+orgID+'.L.SP.fq'),'S',(path2outdir+orgID+'.L.SP.sam'))
+predictInsertionOG(path2outdir,(orgID+'.L'),path2outdir+orgID+'.L.predict')
+sortPredict(path2outdir+orgID+'.L.predict',path2outdir+orgID+'.L.predict.sort',chromLen)
+cleanup('L',orgID,path2outdir)
 
-bwaMeM(path2polyA,path2outdir+orgID+'.PE.fq','P','L',(orgID+'.P.polyA.sam'))
-bwaMeM(path2polyA,path2outdir+orgID+'.SE.fq','S','L',(orgID+'.S.polyA.sam'))
-processSam_polyA((orgID+'.P.polyA.sam'),(orgID+'.S.polyA.sam'),(orgID+'.polyA.fq'),(orgID+'.polyA.info'))
-bowtie2(path2referenceGenome,(orgID+'.polyA.fq'),'S',(orgID+'.polyA.sam'))
-predictPolyA((orgID+'.polyA.sam'),(orgID+'.polyA.predict'),(orgID+'.polyA.info'))
-cleanup('A',orgID)
+bwaMeM(path2polyA,path2outdir+orgID+'.PE.fq','P','L',(path2outdir+orgID+'.P.polyA.sam'))
+bwaMeM(path2polyA,path2outdir+orgID+'.SE.fq','S','L',(path2outdir+orgID+'.S.polyA.sam'))
+processSam_polyA((path2outdir+orgID+'.P.polyA.sam'),(path2outdir+orgID+'.S.polyA.sam'),(path2outdir+orgID+'.polyA.fq'),(path2outdir+orgID+'.polyA.info'))
+bowtie2(path2referenceGenome,(path2outdir+orgID+'.polyA.fq'),'S',(path2outdir+orgID+'.polyA.sam'))
+predictPolyA((path2outdir+orgID+'.polyA.sam'),(path2outdir+orgID+'.polyA.predict'),(path2outdir+orgID+'.polyA.info'))
+cleanup('A',orgID,path2outdir)
