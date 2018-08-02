@@ -681,7 +681,7 @@ def parseSplitFQ(path2fq,rnSet,path2outFQ):
 def sortPredict(path2predict,outfile,chromLen):
     with open(outfile,'w') as out:
         sorting_piles,chrom_list=[],[]
-        for i in range(1,(int(chromLen)+1):
+        for i in range(1,(int(chromLen)+1)):
             sorting_piles.append([])
             chrom_list.append(str(i))
         for p in lister(path2predict):
